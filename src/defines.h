@@ -2,8 +2,9 @@
 #define DEFINES_H
 
 #include <stdint.h>
+#include <iostream>
 
-#define NESTEST_MODE true
+#define NESTEST_MODE false
 
 enum CPU_MODE {
     ABSOLUTE = 1,
@@ -13,13 +14,15 @@ enum CPU_MODE {
     ABSOLUTE_Y_PC = 5,
     ACCUMULATOR = 6,
     IMMEDIATE = 7,
-    INDIRECT = 8,
-    INDIRECT_X = 9,
-    INDIRECT_Y = 10,
-    INDIRECT_Y_PC = 11,
-    ZERO_PAGE = 12,
-    ZERO_PAGE_X = 13,
-    ZERO_PAGE_Y = 14
+    IMPLIED = 8,
+    INDIRECT = 9,
+    INDIRECT_X = 10,
+    INDIRECT_Y = 11,
+    INDIRECT_Y_PC = 12,
+    RELATIVE = 13,
+    ZERO_PAGE = 14,
+    ZERO_PAGE_X = 15,
+    ZERO_PAGE_Y = 16
 };
 
 enum CPU_FLAG {
@@ -40,5 +43,12 @@ typedef union __PAIR_REGISTER {
     };
     uint16_t w;
 } PAIR_REGISTER;
+
+typedef struct __CPU_OPCODE {
+    char name[4];
+    CPU_MODE mode;
+    int size;
+    int cycles;
+} CPU_OPCODE;
 
 #endif

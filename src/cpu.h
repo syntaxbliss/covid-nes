@@ -4,6 +4,8 @@
 #include "defines.h"
 #include <iostream>
 #include "utils.h"
+#include <map>
+#include <cstring>
 
 class CPU {
     public:
@@ -14,6 +16,9 @@ class CPU {
         int             execute(uint8_t);
 
     private:
+        #if NESTEST_MODE
+        void            trace(uint8_t);
+        #endif
         uint16_t        address(CPU_MODE);
         void            clearFlag(CPU_FLAG);
         void            setFlag(CPU_FLAG);
@@ -30,7 +35,7 @@ class CPU {
         void            _bit(CPU_MODE, int);
         void            _returnSub(int);
         void            _push(uint8_t, bool, int);
-        void            _pull(uint8_t, bool, int);
+        void            _pull(uint8_t &, bool, int);
         void            _and(CPU_MODE, int);
         void            _compare(CPU_MODE, uint8_t, int);
         void            _or(CPU_MODE, int);
@@ -49,6 +54,9 @@ class CPU {
         void            _rotateLeft(CPU_MODE, int);
 
     private:
+        #if NESTEST_MODE
+        std::map<int, CPU_OPCODE>   opcodesTable;
+        #endif
         uint8_t         (*read)(uint16_t);
         void            (*write)(uint16_t, uint8_t);
         PAIR_REGISTER   pc;

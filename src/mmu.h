@@ -11,6 +11,8 @@ class MMU {
                     MMU();
         virtual     ~MMU();
         void        allocate(uint8_t*);
+        uint8_t     readRom(uint16_t);
+        void        writeRom(uint16_t, uint8_t);
 
     private:
         uint8_t*    rom;

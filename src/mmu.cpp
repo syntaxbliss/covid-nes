@@ -31,3 +31,11 @@ void MMU::allocate(uint8_t *cartridge) {
 
     memcpy(vram, &cartridge[16 + 0x4000 * romBanks], 0x2000);
 }
+
+uint8_t MMU::readRom(uint16_t address) {
+    return rom[address];
+}
+
+void MMU::writeRom(uint16_t address, uint8_t value) {
+    rom[address] = value;
+}

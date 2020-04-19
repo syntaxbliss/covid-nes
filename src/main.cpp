@@ -4,6 +4,7 @@
 int main() {
     NES* nes = NES::GetInstance();
     nes->loadFile("/home/lebird/Development/covid-nes/roms/nestest.nes");
+    nes->start();
 
     delete nes;
     std::cout << "Exit..." << std::endl;

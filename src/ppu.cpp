@@ -68,6 +68,10 @@ void PPU::writeRegister(int reg, uint8_t value) {
             regs.r1.value = value;
         } break;
 
+        case 3: {
+            // TODO: sprites
+        } break;
+
         case 5: {
             // TODO: scrolling
         } break;

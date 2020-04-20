@@ -3,8 +3,10 @@
 
 #include <stdint.h>
 #include <iostream>
+#include "include/SDL.h"
 
 #define NESTEST_MODE false
+#define DEBUG_MODE true
 
 enum CPU_MODE {
     ABSOLUTE = 1,
@@ -106,5 +108,15 @@ typedef struct __PPU_REGISTERS {
     PPU_REGISTER_LOOPY r5;
     PPU_REGISTER_LOOPY r6;
 } PPU_REGISTERS;
+
+typedef struct __EMULATOR_WINDOW {
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    SDL_Texture* display;
+    int width;
+    int height;
+} EMULATOR_WINDOW;
+
+static const uint32_t DEBUGGER_PALETTE[4] = {0x000000, 0xff0000, 0x00ff00, 0x0000ff};
 
 #endif

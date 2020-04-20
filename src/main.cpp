@@ -3,7 +3,8 @@
 
 int main() {
     NES* nes = NES::GetInstance();
-    nes->loadFile("/home/lebird/Development/covid-nes/roms/nestest.nes");
+    // nes->loadFile("/home/lebird/Development/covid-nes/roms/nestest.nes");
+    nes->loadFile("/home/lebird/Development/covid-nes/roms/balloon.nes");
     nes->start();
 
     delete nes;

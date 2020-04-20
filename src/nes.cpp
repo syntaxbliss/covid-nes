@@ -23,12 +23,17 @@ NES::NES() {
     cpu = new CPU(&BridgeReadRom, &BridgeWriteRom);
     ppu = new PPU(&BridgeReadVram, &BridgeWriteVram);
     running = false;
+
+    #if DEBUG_MODE
+    debugger = new Debugger(mmu);
+    #endif
 }
 
 NES::~NES() {
     delete mmu;
     delete cpu;
     delete ppu;
+    teardownGraphics();
 }
 
 NES* NES::GetInstance() {
@@ -53,6 +58,7 @@ void NES::loadFile(const char *path) {
 }
 
 void NES::start() {
+    launchGraphics();
     cpu->reset();
 
     running = true;
@@ -66,12 +72,36 @@ void NES::start() {
             ticks += cpu->execute(cpu->fetch());
         }
 
+        #if DEBUG_MODE
+        debugger->drawPatterns();
+        #endif
+
         ppu->update();
         handleInterrupts();
 
         ticks -= timmingTable[timmingIndex];
         timmingIndex = ((timmingIndex + 1) % 3);
     }
+}
+
+void NES::launchGraphics() {
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+        std::printf("NES :: could not intialize graphics [%s]", SDL_GetError());
+        std::cin.get();
+        exit(1);
+    }
+
+    #if DEBUG_MODE
+    debugger->launchGraphics();
+    #endif
+}
+
+void NES::teardownGraphics() {
+    #if DEBUG_MODE
+    debugger->teardownGraphics();
+    #endif
+
+    SDL_Quit();
 }
 
 void NES::handleInterrupts() {

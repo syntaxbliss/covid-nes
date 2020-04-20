@@ -63,25 +63,18 @@ void NES::start() {
 
     running = true;
 
-    int ticks = 0;
-    int timmingTable[] = {114, 114, 113};
-    int timmingIndex = 0;
-
     while (running) {
-        for (int i = 0; i < timmingTable[timmingIndex]; i++) {
-            ticks += cpu->execute(cpu->fetch());
-        }
+        int ticks = cpu->execute(cpu->fetch());
 
-        #if DEBUG_MODE
-        debugger->drawPatterns();
-        debugger->drawNameTables();
-        #endif
-
-        ppu->update();
+        ppu->update(ticks * 3);
         handleInterrupts();
 
-        ticks -= timmingTable[timmingIndex];
-        timmingIndex = ((timmingIndex + 1) % 3);
+        if (ppu->readyToRender()) {
+            #if DEBUG_MODE
+            debugger->drawPatterns();
+            debugger->drawNameTables();
+            #endif
+        }
     }
 }
 

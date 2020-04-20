@@ -123,6 +123,24 @@ enum NT_MIRRORING {
     VERTICAL
 };
 
+enum PPU_SCANLINE {
+    POST_RENDER,
+    PRE_RENDER,
+    VBLANK,
+    VISIBLE
+};
+
+typedef struct __PPU_PIPELINE {
+    uint16_t bkgShiftL;
+    uint16_t bkgShiftH;
+    uint8_t atrShiftL;
+    uint8_t atShiftH;
+    uint8_t bkgLatchL;
+    uint8_t bkgLatchH;
+    bool atrLatchL;
+    bool atrLatchH;
+} PPU_PIPELINE;
+
 static const uint32_t DEBUGGER_PALETTE[4] = {0x000000, 0xff0000, 0x00ff00, 0x0000ff};
 
 #endif

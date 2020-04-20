@@ -1,3 +1,7 @@
+#pragma once
+#ifndef UTILS_H
+#define UTILS_H
+
 class Utils {
     public:
         static uint16_t MakeAddress(uint8_t h, uint8_t l) {
@@ -14,3 +18,5 @@ class Utils {
             return TestByteBit(value, 7);
         }
 };
+
+#endif

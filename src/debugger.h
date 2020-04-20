@@ -1,3 +1,4 @@
+#pragma once
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
@@ -9,9 +10,10 @@ class Debugger {
     public:
                         Debugger(MMU*);
         virtual         ~Debugger();
-        void            drawPatterns();
         void            launchGraphics();
         void            teardownGraphics();
+        void            drawPatterns();
+        void            drawNameTables();
 
     private:
         MMU*            mmu;

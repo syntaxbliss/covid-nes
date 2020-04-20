@@ -808,7 +808,7 @@ void CPU::trace(uint8_t opcode) {
         case CPU_MODE::ABSOLUTE: {
             uint16_t addr = Utils::MakeAddress(op2, op1);
 
-            if (strcmp(data.name, "JMP") == 0 || strcmp(data.name, "JSR") == 0) {
+            if ((strcmp(data.name, "JMP") == 0) || (strcmp(data.name, "JSR") == 0)) {
                 fprintf(fp, "$%04X%23s", addr, "");
             } else {
                 fprintf(fp, "$%04X = %02X%18s", addr, read(addr), "");

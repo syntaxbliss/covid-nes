@@ -74,6 +74,7 @@ void NES::start() {
 
         #if DEBUG_MODE
         debugger->drawPatterns();
+        debugger->drawNameTables();
         #endif
 
         ppu->update();

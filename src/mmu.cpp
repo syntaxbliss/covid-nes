@@ -7,6 +7,7 @@ MMU::MMU() {
     memset(rom, 0, 0x10000);
     memset(vram, 0, 0x4000);
     memset(sram, 0, 0x100);
+    ntMirroring = NT_MIRRORING::HORIZONTAL;
 }
 
 MMU::~MMU() {
@@ -30,6 +31,8 @@ void MMU::allocate(uint8_t *cartridge) {
     }
 
     memcpy(vram, &cartridge[16 + 0x4000 * romBanks], 0x2000);
+
+    ntMirroring = (Utils::TestByteBit(cartridge[6], 0) ? NT_MIRRORING::VERTICAL : NT_MIRRORING::HORIZONTAL);
 }
 
 uint8_t MMU::readRom(uint16_t address) {
@@ -41,9 +44,72 @@ void MMU::writeRom(uint16_t address, uint8_t value) {
 }
 
 uint8_t MMU::readVram(uint16_t address) {
-    return vram[address];
+    uint16_t addr = (address & 0x3fff);
+
+    // pattern tables
+    if (addr < 0x2000) {
+        return vram[addr];
+    }
+
+    // name tables
+    else if ((addr >= 0x2000) && (addr < 0x3f00)) {
+        if (addr >= 0x3000) {
+            addr -= 0x1000;
+        }
+
+        return vram[ntAddress(addr)];
+    }
+
+    // palettes
+    else {
+        // TODO: palettes
+        return vram[addr];
+    }
 }
 
 void MMU::writeVram(uint16_t address, uint8_t value) {
-    vram[address] = value;
+    uint16_t addr = (address & 0x3fff);
+
+    // pattern tables
+    if (addr < 0x2000) {
+        // TODO: mappers
+        std::cout << "MMU :: trying to write to a pattern table" << std::endl;
+        std::cin.get();
+        exit(1);
+    }
+
+    // name tables
+    else if ((addr >= 0x2000) && (addr < 0x3f00)) {
+        if (addr >= 0x3000) {
+            addr -= 0x1000;
+        }
+
+        vram[ntAddress(addr)] = value;
+    }
+
+    // palettes
+    else {
+        // TODO: palettes
+        vram[addr] = value;
+    }
+}
+
+uint16_t MMU::ntAddress(uint16_t address) {
+    uint16_t r = address;
+
+    if (ntMirroring == NT_MIRRORING::HORIZONTAL) {
+        switch (address & 0x2c00) {
+            case 0x2400: case 0x2c00: {
+                r = (address - 0x400);
+            } break;
+        }
+    } else {
+        switch (address & 0x2c00) {
+            case 0x2800: case 0x2c00: {
+                r = (address - 0x800);
+            } break;
+        }
+    }
+
+    return r;
 }

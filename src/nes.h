@@ -1,3 +1,4 @@
+#pragma once
 #ifndef NES_H
 #define NES_H
 

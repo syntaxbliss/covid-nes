@@ -71,3 +71,7 @@ void Debugger::drawPatterns() {
     SDL_RenderCopy(patterns.renderer, patterns.display, NULL, NULL);
     SDL_RenderPresent(patterns.renderer);
 }
+
+void Debugger::drawNameTables() {
+    //
+}

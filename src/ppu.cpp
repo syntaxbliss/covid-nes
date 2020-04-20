@@ -8,6 +8,7 @@ PPU::PPU(uint8_t (*readVramHandler)(uint16_t), void (*writeVramHandler)(uint16_t
     regs.r2.value = 0;
     regs.r5.value = 0;
     regs.r6.value = 0;
+    fineX = 0;
     ticks = 0;
     scanline = 0;
     firstRead = true;
@@ -62,6 +63,7 @@ void PPU::writeRegister(int reg, uint8_t value) {
     switch (reg) {
         case 0: {
             regs.r0.value = value;
+            regs.r5.nameTable = value;
         } break;
 
         case 1: {
@@ -73,15 +75,33 @@ void PPU::writeRegister(int reg, uint8_t value) {
         } break;
 
         case 5: {
-            // TODO: scrolling
+            if (firstRead) {
+                regs.r5.coarseX = (value >> 3);
+                fineX = (value & 0x7);
+            } else {
+                regs.r5.coarseY = (value >> 3);
+                regs.r5.fineY = value;
+            }
+
+            firstRead = (! firstRead);
         } break;
 
         case 6: {
-            // TODO: scrolling
+            if (firstRead) {
+                regs.r5.value &= 0x80ff;
+                regs.r5.value |= ((value << 8) & 0x3f00);
+            } else {
+                regs.r5.value &= 0xff00;
+                regs.r5.value |= value;
+                regs.r6.value = regs.r5.value;
+            }
+
+            firstRead = (! firstRead);
         } break;
 
         case 7: {
-            // TODO: rendering
+            writeVram(regs.r6.addr, value);
+            regs.r6.addr += (regs.r0.increment ? 32 : 1);
         } break;
 
         default: {

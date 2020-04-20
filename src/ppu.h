@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PPU_H
 #define PPU_H
 
@@ -18,6 +19,7 @@ class PPU {
         uint8_t         (*readVram)(uint16_t);
         void            (*writeVram)(uint16_t, uint8_t);
         PPU_REGISTERS   regs;
+        uint8_t         fineX;
         int             ticks;
         int             scanline;
         bool            firstRead;

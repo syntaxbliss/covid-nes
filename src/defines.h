@@ -1,3 +1,4 @@
+#pragma once
 #ifndef DEFINES_H
 #define DEFINES_H
 
@@ -116,6 +117,11 @@ typedef struct __EMULATOR_WINDOW {
     int width;
     int height;
 } EMULATOR_WINDOW;
+
+enum NT_MIRRORING {
+    HORIZONTAL,
+    VERTICAL
+};
 
 static const uint32_t DEBUGGER_PALETTE[4] = {0x000000, 0xff0000, 0x00ff00, 0x0000ff};
 

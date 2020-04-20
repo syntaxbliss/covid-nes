@@ -8,17 +8,27 @@ void BridgeWriteRom(uint16_t address, uint8_t value) {
     NES::GetInstance()->writeRom(address, value);
 }
 
+uint8_t BridgeReadVram(uint16_t address) {
+    return NES::GetInstance()->readVram(address);
+}
+
+void BridgeWriteVram(uint16_t address, uint8_t value) {
+    NES::GetInstance()->writeVram(address, value);
+}
+
 NES* NES::Instance = nullptr;
 
 NES::NES() {
     mmu = new MMU();
     cpu = new CPU(&BridgeReadRom, &BridgeWriteRom);
+    ppu = new PPU(&BridgeReadVram, &BridgeWriteVram);
     running = false;
 }
 
 NES::~NES() {
     delete mmu;
     delete cpu;
+    delete ppu;
 }
 
 NES* NES::GetInstance() {
@@ -47,15 +57,55 @@ void NES::start() {
 
     running = true;
 
-    for (int i = 0; i < 5100; i++) {
-        cpu->execute(cpu->fetch());
+    int ticks = 0;
+    int timmingTable[] = {114, 114, 113};
+    int timmingIndex = 0;
+
+    while (running) {
+        for (int i = 0; i < timmingTable[timmingIndex]; i++) {
+            ticks += cpu->execute(cpu->fetch());
+        }
+
+        ppu->update();
+        handleInterrupts();
+
+        ticks -= timmingTable[timmingIndex];
+        timmingIndex = ((timmingIndex + 1) % 3);
+    }
+}
+
+void NES::handleInterrupts() {
+    if (ppu->wantNmi()) {
+        cpu->nmi();
     }
 }
 
 uint8_t NES::readRom(uint16_t address) {
-    return mmu->readRom(address);
+    // ppu regs
+    if ((address >= 0x2000) && (address < 0x4000)) {
+        return ppu->readRegister(address & 0x7);
+    }
+
+    else {
+        return mmu->readRom(address);
+    }
 }
 
 void NES::writeRom(uint16_t address, uint8_t value) {
-    mmu->writeRom(address, value);
+    // ppu regs
+    if ((address >= 0x2000) && (address < 0x4000)) {
+        ppu->writeRegister(address & 0x7, value);
+    }
+
+    else {
+        mmu->writeRom(address, value);
+    }
+}
+
+uint8_t NES::readVram(uint16_t address) {
+    return mmu->readVram(address);
+}
+
+void NES::writeVram(uint16_t address, uint8_t value) {
+    mmu->writeVram(address, value);
 }

@@ -39,3 +39,11 @@ uint8_t MMU::readRom(uint16_t address) {
 void MMU::writeRom(uint16_t address, uint8_t value) {
     rom[address] = value;
 }
+
+uint8_t MMU::readVram(uint16_t address) {
+    return vram[address];
+}
+
+void MMU::writeVram(uint16_t address, uint8_t value) {
+    vram[address] = value;
+}

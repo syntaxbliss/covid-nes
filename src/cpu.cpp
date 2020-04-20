@@ -179,6 +179,15 @@ void CPU::reset() {
     totalTicks = 0;
 }
 
+void CPU::nmi() {
+    stackPush(pc.h);
+    stackPush(pc.l);
+    stackPush(f | 0x20);
+    setFlag(CPU_FLAG::I);
+    pc.l = read(0xfffa);
+    pc.h = read(0xfffb);
+}
+
 uint8_t CPU::fetch() {
     return read(pc.w++);
 }

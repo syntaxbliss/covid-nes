@@ -51,4 +51,60 @@ typedef struct __CPU_OPCODE {
     int cycles;
 } CPU_OPCODE;
 
+typedef union __PPU_REGISTER_0 {
+    struct {
+        unsigned nameTable : 2;
+        unsigned increment : 1;
+        unsigned sprPattern : 1;
+        unsigned bkgPattern : 1;
+        unsigned sprSize : 1;
+        unsigned selector : 1;
+        unsigned nmi : 1;
+    };
+    uint8_t value;
+} PPU_REGISTER_0;
+
+typedef union __PPU_REGISTER_1 {
+    struct {
+        unsigned greyscale : 1;
+        unsigned bkgClip : 1;
+        unsigned sprClip : 1;
+        unsigned bkgVisible : 1;
+        unsigned sprVisible : 1;
+        unsigned red : 1;
+        unsigned green : 1;
+        unsigned blue : 1;
+    };
+    uint8_t value;
+} PPU_REGISTER_1;
+
+typedef union __PPU_REGISTER_2 {
+    struct {
+        unsigned openBus : 5;
+        unsigned sprOverflow : 1;
+        unsigned sprZero : 1;
+        unsigned vblank : 1;
+    };
+    uint8_t value;
+} PPU_REGISTER_2;
+
+typedef union __PPU_REGISTER_LOOPY {
+    struct {
+        unsigned coarseX : 5;
+        unsigned coarseY : 5;
+        unsigned nameTable : 2;
+        unsigned fineY : 3;
+    };
+    unsigned addr : 14;
+    unsigned value : 15;
+} PPU_REGISTER_LOOPY;
+
+typedef struct __PPU_REGISTERS {
+    PPU_REGISTER_0 r0;
+    PPU_REGISTER_1 r1;
+    PPU_REGISTER_2 r2;
+    PPU_REGISTER_LOOPY r5;
+    PPU_REGISTER_LOOPY r6;
+} PPU_REGISTERS;
+
 #endif

@@ -9,11 +9,12 @@
 
 class CPU {
     public:
-                        CPU(uint8_t (*read)(uint16_t), void (*write)(uint16_t, uint8_t));
+                        CPU(uint8_t (*)(uint16_t), void (*)(uint16_t, uint8_t));
         virtual         ~CPU();
         void            reset();
         uint8_t         fetch();
         int             execute(uint8_t);
+        void            nmi();
 
     private:
         #if NESTEST_MODE

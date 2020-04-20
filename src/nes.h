@@ -3,6 +3,7 @@
 
 #include "mmu.h"
 #include "cpu.h"
+#include "ppu.h"
 
 class NES {
     public:
@@ -12,15 +13,19 @@ class NES {
         void        start();
         uint8_t     readRom(uint16_t);
         void        writeRom(uint16_t, uint8_t);
+        uint8_t     readVram(uint16_t);
+        void        writeVram(uint16_t, uint8_t);
 
     private:
                     NES();
+        void        handleInterrupts();
 
     private:
         static NES* Instance;
         bool        running;
         MMU*        mmu;
         CPU*        cpu;
+        PPU*        ppu;
 };
 
 #endif

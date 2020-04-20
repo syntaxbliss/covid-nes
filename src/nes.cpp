@@ -25,7 +25,7 @@ NES::NES() {
     running = false;
 
     #if DEBUG_MODE
-    debugger = new Debugger(mmu);
+    debugger = new Debugger(mmu, ppu);
     #endif
 }
 

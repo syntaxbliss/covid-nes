@@ -7,6 +7,9 @@
 
 class PPU {
     public:
+        #if DEBUG_MODE
+        uint16_t        getBasePT();
+        #endif
                         PPU(uint8_t (*)(uint16_t), void (*)(uint16_t, uint8_t));
         virtual         ~PPU();
         void            update();

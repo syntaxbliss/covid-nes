@@ -18,6 +18,12 @@ PPU::PPU(uint8_t (*readVramHandler)(uint16_t), void (*writeVramHandler)(uint16_t
 
 PPU::~PPU() {}
 
+#if DEBUG_MODE
+uint16_t PPU::getBasePT() {
+    return (regs.r0.bkgPattern * 0x1000);
+}
+#endif
+
 bool PPU::wantNmi() {
     bool result = pendingNmi;
 

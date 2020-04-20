@@ -19,10 +19,12 @@ void BridgeWriteVram(uint16_t address, uint8_t value) {
 NES* NES::Instance = nullptr;
 
 NES::NES() {
+    screenBuffer = (int*)malloc(sizeof(int) * 256 * 240);
     mmu = new MMU();
     cpu = new CPU(&BridgeReadRom, &BridgeWriteRom);
-    ppu = new PPU(&BridgeReadVram, &BridgeWriteVram);
+    ppu = new PPU(&BridgeReadVram, &BridgeWriteVram, screenBuffer);
     running = false;
+    screen = (EMULATOR_WINDOW*)malloc(sizeof(EMULATOR_WINDOW));
 
     #if DEBUG_MODE
     debugger = new Debugger(mmu, ppu);
@@ -33,6 +35,8 @@ NES::~NES() {
     delete mmu;
     delete cpu;
     delete ppu;
+    free(screen);
+    free(screenBuffer);
     teardownGraphics();
 }
 
@@ -70,6 +74,8 @@ void NES::start() {
         handleInterrupts();
 
         if (ppu->readyToRender()) {
+            drawScreen();
+
             #if DEBUG_MODE
             debugger->drawPatterns();
             debugger->drawNameTables();
@@ -88,6 +94,8 @@ void NES::launchGraphics() {
     #if DEBUG_MODE
     debugger->launchGraphics();
     #endif
+
+    Utils::CreateEmulatorWindow(screen, "COVID-NES", 256, 240, 500, 0);
 }
 
 void NES::teardownGraphics() {
@@ -102,6 +110,33 @@ void NES::handleInterrupts() {
     if (ppu->wantNmi()) {
         cpu->nmi();
     }
+}
+
+void NES::drawScreen() {
+    int *index = screenBuffer;
+
+    SDL_RenderPresent(screen->renderer);
+    SDL_SetRenderTarget(screen->renderer, screen->display);
+
+    for (int y = 0; y < 240; y++) {
+        for (int x = 0; x < 256; x++) {
+            uint32_t color = NES_PALETTE[*index];
+
+            SDL_SetRenderDrawColor(
+                screen->renderer,
+                (color >> 16) & 0xff,
+                (color >> 8) & 0xff,
+                color & 0xff,
+                255
+            );
+            SDL_RenderDrawPoint(screen->renderer, x, y);
+            index++;
+        }
+    }
+
+    SDL_SetRenderTarget(screen->renderer, NULL);
+    SDL_RenderCopy(screen->renderer, screen->display, NULL, NULL);
+    SDL_RenderPresent(screen->renderer);
 }
 
 uint8_t NES::readRom(uint16_t address) {

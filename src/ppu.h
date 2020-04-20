@@ -4,13 +4,15 @@
 
 #include <stdint.h>
 #include "defines.h"
+#include "utils.h"
+#include <cstring>
 
 class PPU {
     public:
         #if DEBUG_MODE
         uint16_t                    getBasePT();
         #endif
-                                    PPU(uint8_t (*)(uint16_t), void (*)(uint16_t, uint8_t));
+                                    PPU(uint8_t (*)(uint16_t), void (*)(uint16_t, uint8_t), int*);
         virtual                     ~PPU();
         void                        update(int);
         bool                        wantNmi();
@@ -29,6 +31,7 @@ class PPU {
         void                        verticalScroll();
         void                        horizontalReload();
         void                        verticalReload();
+        void                        renderPixel();
 
     private:
         uint8_t                     (*readVram)(uint16_t);
@@ -46,6 +49,7 @@ class PPU {
         uint8_t                     tileNumber;
         uint8_t                     attributeByte;
         uint8_t                     delayedBuffer;
+        int*                        screenBuffer;
 };
 
 #endif

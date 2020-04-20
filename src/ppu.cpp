@@ -1,6 +1,6 @@
 #include "ppu.h"
 
-PPU::PPU(uint8_t (*readVramHandler)(uint16_t), void (*writeVramHandler)(uint16_t, uint8_t)) {
+PPU::PPU(uint8_t (*readVramHandler)(uint16_t), void (*writeVramHandler)(uint16_t, uint8_t), int *buffer) {
     readVram = readVramHandler;
     writeVram = writeVramHandler;
     regs.r0.value = 0;
@@ -19,7 +19,7 @@ PPU::PPU(uint8_t (*readVramHandler)(uint16_t), void (*writeVramHandler)(uint16_t
     pipeline.bkgShiftL = 0;
     pipeline.bkgShiftH = 0;
     pipeline.atrShiftL = 0;
-    pipeline.atShiftH = 0;
+    pipeline.atrShiftH = 0;
     pipeline.bkgLatchL = 0;
     pipeline.bkgLatchH = 0;
     pipeline.atrLatchL = false;
@@ -27,6 +27,7 @@ PPU::PPU(uint8_t (*readVramHandler)(uint16_t), void (*writeVramHandler)(uint16_t
     tileNumber = 0;
     attributeByte = 0;
     delayedBuffer = 0;
+    screenBuffer = buffer;
 }
 
 PPU::~PPU() {}
@@ -198,7 +199,7 @@ void PPU::stepScanline() {
     } else if ((type == PPU_SCANLINE::VISIBLE) || (type == PPU_SCANLINE::PRE_RENDER)) {
         switch (ticks) {
             case 2 ... 255: case 322 ... 337: {
-                // renderPixel();
+                renderPixel();
 
                 switch (ticks % 8) {
                     case 1: {
@@ -246,13 +247,13 @@ void PPU::stepScanline() {
             } break;
 
             case 256: {
-                // renderPixel();
+                renderPixel();
                 pipeline.bkgLatchH = readVram(renderAddress);
                 verticalScroll();
             } break;
 
             case 257: {
-                // rendrPixel();
+                renderPixel();
                 updatePipeline();
                 horizontalReload();
             } break;
@@ -288,6 +289,37 @@ void PPU::stepScanline() {
             } break;
         }
     }
+}
+
+void PPU::renderPixel() {
+    // u8 palette = 0, objPalette = 0;
+    // bool objPriority = 0;
+    int x = ticks - 2;
+    int index = 0;
+
+    if ((scanline < 240) && (x >= 0) && (x < 256)) {
+        if (regs.r1.bkgVisible && (! ((! regs.r1.bkgClip) && (x < 8)))) {
+            index = (
+                (Utils::GetBitValue(pipeline.bkgShiftH, 15 - fineX) << 1) |
+                (Utils::GetBitValue(pipeline.bkgShiftL, 15 - fineX) << 0)
+            );
+
+            if (index) {
+                index |= (
+                    (Utils::GetBitValue(pipeline.atrShiftH, 7 - fineX) << 1) |
+                    (Utils::GetBitValue(pipeline.atrShiftL, 7 - fineX) << 0)
+                ) << 2;
+            }
+        }
+
+        // if (objPalette && (palette == 0 || objPriority == 0)) palette = objPalette;
+        screenBuffer[scanline * 256 + x] = readVram(0x3f00 + (isRendering() ? index : 0));
+    }
+
+    pipeline.bkgShiftL <<= 1;
+    pipeline.bkgShiftH <<= 1;
+    pipeline.atrShiftL = ((pipeline.atrShiftL << 1) | pipeline.atrLatchL);
+    pipeline.atrShiftH = ((pipeline.atrShiftH << 1) | pipeline.atrLatchH);
 }
 
 void PPU::updatePipeline() {

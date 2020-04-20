@@ -92,7 +92,7 @@ void Debugger::drawNameTables() {
                 }
             }
         }
-    };
+    }
 
     SDL_SetRenderTarget(nameTables->renderer, NULL);
     SDL_RenderCopy(nameTables->renderer, nameTables->display, NULL, NULL);

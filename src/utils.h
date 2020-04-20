@@ -18,6 +18,13 @@ class Utils {
             return TestByteBit(value, 7);
         }
 
+        template<typename T>
+        static int GetBitValue(T value, int bit) {
+            T mask = (1 << bit);
+
+            return (((value & mask) == mask) ? 1 : 0);
+        }
+
         static void CreateEmulatorWindow(
             EMULATOR_WINDOW* w,
             const char *title,
